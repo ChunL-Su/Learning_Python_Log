@@ -1,2 +1,109 @@
 # Learning_Python_Log
 Python Log module
+# Log
+- 内容转自博客https://www.cnblogs.com/yyds/p/6901864.html
+- python中使用logging模块
+- 四大组件（用于定制个性化的log）
+## 1.日志相关概念
+- 在程序运行的时候，定期的自动的记录一些关于运行的信息，记录的信息需要写在磁盘文件上，
+由于写日志属于I/O操作，所以会极大的拖慢系统的运行，so不建议所有东西都记录下来，只记录
+一些重要的东西
+
+- 在程序运行的生命周期之中，不同的人所关心的东西是不同的
+    - 对于开发人员：关心程序是否在正常运转，如果报错需要记录报错信息
+    - 对于一般用户：关心程序正常运行，一旦出错需要报告一个大体的原因，或者一个解决方案
+    - 对于运维人员：关心是否正常运行，需要定期报告程序运行状态，崩溃后也是需要报告一个原因
+- 综上所述，日志需要有不同的级别level
+    - DEBUG
+    - INFO
+    - NOTICE
+    - WARNING
+    - ERROR
+    - CRITICAL
+    - ALERT
+    - EMERGERNCY
+- 日志的基本作用
+    - 方便调试
+    - 了解当前软件的运行情况
+    - 分析和定位问题，还原现场
+- 日志所需要记录的信息
+    - time
+    - 报错位置
+    - level
+    - 内容，哪个函数，什么输入时报错
+## 2.使用logging模块
+- 日志级别
+    - 级别可以自定义(但没什么必要，系统定义的已经够用了)
+    - 系统已定义好的级别
+        - DIBUG
+        - INFO
+        - WARNING
+        - ERROR
+        - CRITICAL
+- 初始化/写日志时需要指定级别，只有当前事件的级别等于或高于默认级别时才会被记录
+- 日志使用“单例模式”设计，不管有多少个被实例化使用，最终只会记录在一个日志中
+- 使用方式：
+    - 1.直接使用logging
+        - logging.debug(msg, *args, **kwargs)# 定义一条debug级别的日志
+            - 例：logging.debug('This is a debug log')
+            - 系统默认日志等级为warning级别，只有大于等于warning等级才会输出到控制台上
+        - logging.info(msg, *args, **kwargs)
+        - logging.warning(msg, *args, **kwargs)
+        - logging.error(msg, *args, **kwargs)
+        - logging.critical(msg, *args, **kwargs)
+        - logging.log(level, *args, **kwargs) # 自定义一条指定级别的日志
+            - 其中level可以定义为
+            - logging.DEBUG
+            - logging.INFO
+            - logging.WARNING
+            - logging.ERROR
+            - logging.CRITICAL
+        - logging.basicConfig(**kwargs) # 对root logger进行一次性配置
+            - 按住左Ctrl键，再用鼠标点函数名称可以调出原函数
+            - 定制个性化的日志
+            - LOG_FORMAT = '%(asctime)s+++%(levelname)s+++%(massage)s'
+            - logging.basicConfig(log_format=LOG_FORMAT)
+                - 百度format参数可查看所有此类参数
+            - logging.basicConfig(**kwargs)只在第一次配置时起作用，以后不起作用
+            - 如果不配置，则使用默认值
+                - 输出：sys.stderr 即，默认打印在控制台上
+                - 级别：默认为WARNING
+                - 格式：level:log_name:content的格式
+## 3.logging模块的处理流程
+- 四大组件
+    - 日志器（Logger）：产生日志的一个接口
+    - 处理器（Handler）：把日志发送到相应的地方
+    - 过滤器（Filter）：更精细的控制日志的输出
+    - 格式器（Formatter）：对输出的信息进行格式化
+- Logger
+    - 产生一个日志
+    - 实例化Logger对象
+        - logging.getLogger()
+    - Logger.setLevel()设置日志器将会处理日志的最低级别
+    - Logger.addHandler()/Logger.removeHandler()为logger对象添加一个或移除一个处理器
+    - Logger.addFilter()/Logger.removeFilter()为logger对象添加或删除一个过滤器
+- Handler
+    - 把日志发送到指定的地方
+    - setLevel
+    - setFormat
+    - addFilter,removeFilter
+    - 常用的Handler
+        - logging.StreamHandler	将日志发送到输出到Stream，如std.out, std.err或任何file-like对象。
+        - logging.FileHandler 将日志发送到磁盘文件，默认情况下文件大小会无限增长
+        - logging.handlers.RotatingFileHandler 将日志发送到磁盘文件，并支持日志文件按大小切割
+        - logging.handlers.TimedRotatingFileHandler	将日志发送到磁盘文件，并支持日志文件按时间切割
+        - logging.handlers.HTTPHandler 将日志以GET或POST的方式发送给一个HTTP服务器
+        - logging.handlers.SMTPHandler 将日志发送给一个指定的email地址
+        - logging.NullHandler 该Handler实例会忽略error messages，通常被想使用logging的library开发者使用来避免'No handlers could be found for logger XXX'信息的出现。
+- Formatter
+    - 直接实例化
+    - logging.Formatter.<u>  </u>init<u>  </u>(fmt=None, datefmt=None, style='%')
+    - 三个参数
+        - fmt:指定消息格式化字符串，如果不指定该参数则默认使用message的原始值
+        - datefmt:指定日期格式字符串，如果不指定该参数则默认使用"%Y-%m-%d %H:%M:%S"
+        - style:Python 3.2新增的参数，可取值为 '%', '{'和 '$'，如果不指定该参数则默认使用'%'
+- Filter
+    - 可以被Handler和Logger使用
+    - 控制传递过来的信息的具体内容
+    
+- 博客中有具体的案例
